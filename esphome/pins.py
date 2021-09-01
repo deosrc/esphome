@@ -17,6 +17,9 @@ def _lookup_pin(value):
         if CORE.board in boards.ESP32_C3_BOARD_PINS:
             board_pins_dict = boards.ESP32_C3_BOARD_PINS
             base_pins = boards.ESP32_C3_BASE_PINS
+        elif CORE.board in boards.ESP32_S2_BOARD_PINS:
+            board_pins_dict = boards.ESP32_S2_BOARD_PINS
+            base_pins = boards.ESP32_S2_BASE_PINS
         else:
             board_pins_dict = boards.ESP32_BOARD_PINS
             base_pins = boards.ESP32_BASE_PINS
@@ -69,6 +72,15 @@ _ESP32C3_SDIO_PINS = {
     17: "Flash IO1/DO",
 }
 
+_ESP32S2_SDIO_PINS = {
+    27: "Flash HOLD#/SPIHD",
+    28: "Flash WP#/SPIWP",
+    29: "Flash CS#/SPICS0",
+    30: "Flash CLK/SPICLK",
+    31: "Flash DO/SPIQ",
+    32: "Flash DI/SPID",
+}
+
 
 def validate_gpio_pin(value):
     value = _translate_pin(value)
@@ -79,6 +91,15 @@ def validate_gpio_pin(value):
             raise cv.Invalid(
                 "This pin cannot be used on ESP32-C3s and is already used by "
                 "the flash interface (function: {})".format(_ESP_SDIO_PINS[value])
+            )
+        return value
+    if CORE.is_esp32_s2:
+        if value < 0 or value > 46:
+            raise cv.Invalid(f"ESP32-S2: Invalid pin number: {value}")
+        if value in _ESP32S2_SDIO_PINS:
+            raise cv.Invalid(
+                "This pin cannot be used on ESP32-S2s and is already used by "
+                "the flash interface (function: {})".format(_ESP32S2_SDIO_PINS[value])
             )
         return value
     if CORE.is_esp32:
@@ -141,6 +162,10 @@ def input_pullup_pin(value):
 
 def output_pin(value):
     value = validate_gpio_pin(value)
+    if CORE.is_esp32_s2:
+        if value == 46:
+            raise cv.Invalid("ESP32-S2: GPIO46 can only be used as an input pin.")
+        return value
     if CORE.is_esp32:
         if 34 <= value <= 39:
             raise cv.Invalid(

@@ -608,6 +608,11 @@ class EsphomeCore:
         """Check if the ESP32-C3 SoC is being used."""
         return self.is_esp32 and self.board in boards.ESP32_C3_BOARD_PINS
 
+    @property
+    def is_esp32_s2(self):
+        """Check if the ESP32-S2 SoC is being used."""
+        return self.is_esp32 and self.board in boards.ESP32_S2_BOARD_PINS
+
     def add_job(self, func, *args, **kwargs):
         self.event_loop.add_job(func, *args, **kwargs)
 

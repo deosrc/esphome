@@ -56,6 +56,7 @@ def validate_board(value: str):
     elif CORE.is_esp32:
         boardlist = list(boards.ESP32_BOARD_PINS.keys())
         boardlist += list(boards.ESP32_C3_BOARD_PINS.keys())
+        boardlist += list(boards.ESP32_S2_BOARD_PINS.keys())
     else:
         raise NotImplementedError
 
